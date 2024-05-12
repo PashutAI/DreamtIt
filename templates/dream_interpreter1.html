@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Dream Interpreter</title>
+    <style>
+        body {
+            font-family: Ariel, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url("https://images.unsplash.com/photo-1533294652670-73facaa10b64?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"); /* Replace 'background_image.jpg' with the path to your image */
+            background-size: cover;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* Adding a slight opacity for better readability */
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .interpretation {
+            margin-top: 15px;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>The Dream Interpreter</h1>
+        <form id="dreamForm" onsubmit="processDream(event)">
+            <textarea id="dreamDescription" placeholder="Describe your dream here..."></textarea><br>
+            <input type="submit" value="Submit">
+        </form>
+        <div class="interpretation" id="interpretationSection" style="display: none;">
+            <h2>Dream Interpretation</h2>
+            <p id="interpretation"></p>
+        </div>
+    </div>
+
+    <script>
+        function processDream(event) {
+            event.preventDefault();
+            var dreamDescription = document.getElementById("dreamDescription").value;
+
+            // Send dream description to server for processing
+            fetch('/interpret', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dream: dreamDescription }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Handle asterisks for bold formatting
+                var interpretation = data.interpretation.replace(/\*(.*?)\*/g, '<br></br>'+'<div><strong>$1</strong></div>');
+                console.log("Original Interpretation: " + data.interpretation);
+                console.log("Formatted Interpretation: " + interpretation);
+                document.getElementById("interpretation").innerHTML = interpretation;
+                document.getElementById("interpretationSection").style.display = "block";
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>
